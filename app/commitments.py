@@ -17,20 +17,20 @@ def due_date(text: str):
     return None
 
 def extract_commitments(transcript: str, source: str = "manual_demo"):
-    chunks = re.split(r"(?<=[.!?])\\s+|\\n+", transcript.strip())
+    chunks = re.split(r"(?<=[.!?])\s+|\n+", transcript.strip())
     cues = ("i will", "i'll", "i can", "i promised", "i promise", "need to", "must ", "going to", "i should")
     results = []
     for sentence in chunks:
-        sentence = sentence.strip(" .\\t")
+        sentence = sentence.strip(" .\t")
         low = sentence.lower()
         if len(sentence) < 8 or not any(cue in low for cue in cues):
             continue
-        match = re.search(r"\\b(?:to|for)\\s+([A-Z][a-z]+)\\b", sentence)
+        match = re.search(r"\b(?:to|for)\s+([A-Z][a-z]+)\b", sentence)
         results.append(Commitment(
             id=str(uuid.uuid4()), task=sentence, owner="You" if low.startswith(("i will", "i'll", "i promised", "i promise")) else None,
             recipient=match.group(1) if match else None, due_date=due_date(sentence),
             source_text=sentence, source=source, confidence=0.68))
-    if not results and transcript.strip():
+    if not results and re.search(r"[a-zA-Z]", transcript):
         results.append(Commitment(id=str(uuid.uuid4()), task=transcript.strip()[:240],
             source_text=transcript.strip(), source=source, confidence=0.35))
     return results
@@ -40,14 +40,26 @@ def detect_conflicts(current: Commitment, previous: list[Commitment]):
     keywords = ("invoice", "report", "book", "submit", "call", "meeting", "send", "finish", "deliver")
     for old in previous:
         same_topic = any(k in current.task.lower() and k in old.task.lower() for k in keywords)
-        travel = any(k in current.task.lower() for k in ("travel", "travelling", "traveling", "flight", "unavailable"))
-        availability_clash = travel and old.due_date and old.due_date == current.due_date
+        
+        travel_current = any(k in current.task.lower() for k in ("travel", "travelling", "traveling", "flight", "unavailable"))
+        travel_old = any(k in old.task.lower() for k in ("travel", "travelling", "traveling", "flight", "unavailable"))
+        
+        availability_clash = (travel_current or travel_old) and current.due_date and old.due_date and current.due_date == old.due_date and not (travel_current and travel_old)
         date_clash = same_topic and current.due_date and old.due_date and current.due_date != old.due_date
-        if (same_topic and date_clash) or availability_clash:
+        
+        if availability_clash:
+            found.append(Conflict(
+                id=str(uuid.uuid4()), title="Possible schedule risk",
+                explanation="This travel or unavailability overlaps with an existing deadline.",
+                severity="high",
+                current_commitment_id=current.id, related_commitment_id=old.id,
+                evidence=[f"New: {current.source_text}", f"Earlier: {old.source_text}"],
+                suggested_message="Hi, I have a schedule clash on this day. Could we confirm the deadline and agree on an updated time?"))
+        elif same_topic and date_clash:
             found.append(Conflict(
                 id=str(uuid.uuid4()), title="Possible deadline conflict",
                 explanation="The new statement may conflict with a previously stored commitment.",
-                severity="high" if availability_clash else "medium",
+                severity="medium",
                 current_commitment_id=current.id, related_commitment_id=old.id,
                 evidence=[f"New: {current.source_text}", f"Earlier: {old.source_text}"],
                 suggested_message="Hi, I may have a timing conflict with this commitment. Could we confirm the deadline and agree on an updated time?"))

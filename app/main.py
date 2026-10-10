@@ -89,6 +89,7 @@ async def ingest(request: IngestRequest):
     created_conflicts = []
     created_suggestions = []
     
+    session_models = []
     for item in extracted:
         old_models = []
         for p in prior:
@@ -96,6 +97,8 @@ async def ingest(request: IngestRequest):
                 old_models.append(Commitment(**p))
             except Exception:
                 pass
+        old_models.extend(session_models)
+        session_models.append(item)
                 
         # 2. Conflict Checker
         conflict_res = await lyzr.run("Conflict Checker", transcript, prior)
