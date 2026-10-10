@@ -1,5 +1,5 @@
 from fastapi import HTTPException, Request
-from .config import settings
+from app.config import settings
 
 def extract_transcript(payload: dict):
     candidates = [payload.get("transcript"), payload.get("text"), payload.get("summary")]

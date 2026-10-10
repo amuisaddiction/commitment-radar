@@ -1,6 +1,6 @@
 import re, uuid
 from datetime import datetime, timedelta
-from .models import Commitment, Conflict
+from app.models import Commitment, Conflict
 
 def due_date(text: str):
     low = text.lower()

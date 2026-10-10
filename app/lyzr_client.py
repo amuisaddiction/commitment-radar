@@ -1,6 +1,6 @@
 import httpx
 import json
-from .config import settings
+from app.config import settings
 
 AGENT_ROLES = {
     "Extractor": "Extract explicit commitments only. Return a JSON array of objects with keys: 'task', 'owner', 'recipient', 'due_date' (ISO or null), 'source_text', 'confidence' (float 0-1). Never invent facts. ONLY RETURN JSON.",

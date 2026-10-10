@@ -1,6 +1,6 @@
 import hashlib, math
 from typing import Any
-from .config import settings
+from app.config import settings
 
 try:
     from fastembed import TextEmbedding

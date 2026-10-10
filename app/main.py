@@ -4,13 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 from datetime import datetime, timezone
 import uuid
-from .config import settings
-from .models import IngestRequest, FulfillmentSuggestion, Commitment, Conflict
-from .commitments import extract_commitments, detect_conflicts
-from .memory import MemoryStore
-from .lyzr_client import LyzrClient
-from .qloo import QlooClient
-from .omi import extract_transcript, verify_webhook
+from app.config import settings
+from app.models import IngestRequest, FulfillmentSuggestion, Commitment, Conflict
+from app.commitments import extract_commitments, detect_conflicts
+from app.memory import MemoryStore
+from app.lyzr_client import LyzrClient
+from app.qloo import QlooClient
+from app.omi import extract_transcript, verify_webhook
 
 app = FastAPI(title=settings.app_name, version="0.1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
