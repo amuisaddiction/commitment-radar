@@ -13,6 +13,7 @@ class Settings(BaseSettings):
     lyzr_agent_id: str = ""
     lyzr_api_base_url: str = ""
     omi_webhook_secret: str = ""
+    qloo_api_key: str = ""
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
 
 settings = Settings()

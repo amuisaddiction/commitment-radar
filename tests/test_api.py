@@ -15,3 +15,9 @@ def test_get_commitments():
     response = client.get("/api/commitments")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+
+def test_ingest():
+    response = client.post('/api/ingest', json={'transcript': 'I will send the report by Friday.', 'source': 'test_api'})
+    assert response.status_code == 200
+    assert response.json()['ok'] == True

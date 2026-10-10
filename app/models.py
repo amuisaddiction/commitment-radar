@@ -31,3 +31,13 @@ class Conflict(BaseModel):
     evidence: list[str] = Field(default_factory=list)
     suggested_message: str = ""
     created_at: datetime = Field(default_factory=utc_now)
+
+class FulfillmentSuggestion(BaseModel):
+    id: str
+    commitment_id: str
+    category: str
+    items: list[dict] = Field(default_factory=list)
+    explanation: str = ''
+    status: str = 'ok'
+    created_at: datetime = Field(default_factory=utc_now)
+

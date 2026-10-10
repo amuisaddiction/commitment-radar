@@ -1,23 +1,17 @@
 services:
   - type: web
-    name: commitment-radar
-    runtime: python
+    name: commitment-radar-api
+    env: python
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: APP_ENV
         value: production
-      - key: QDRANT_URL
-        sync: false
-      - key: QDRANT_API_KEY
-        sync: false
-      - key: LYZR_API_KEY
-        sync: false
-      - key: LYZR_AGENT_ID
-        sync: false
-      - key: LYZR_API_BASE_URL
-        sync: false
-      - key: OMI_WEBHOOK_SECRET
-        sync: false
-      - key: WEBHOOK_SECRET
-        sync: false
+      - key: PORT
+        value: 10000
+      # Configure these in the Render Dashboard:
+      # - QDRANT_URL
+      # - QDRANT_API_KEY
+      # - LYZR_API_KEY
+      # - LYZR_AGENT_ID
+      # - QLOO_API_KEY
